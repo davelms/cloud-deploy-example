@@ -1,0 +1,14 @@
+steps:
+- name: 'gcr.io/k8s-skaffold/pack'
+  entrypoint: 'pack'
+  args: ['build', '--builder=gcr.io/buildpacks/builder', '--publish', 'us-central1-docker.pkg.dev/$PROJECT_ID/my-docker-repo/hello-world:$SHORT_SHA']
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - > 
+    gcloud deploy releases create release-$BUILD_ID
+    --delivery-pipeline=hello-world-app
+    --region=us-central1
+    --source=./
+    --images=hello-world-app=us-central1-docker.pkg.dev/$PROJECT_ID/my-docker-repo/hello-world:$SHORT_SHA 
